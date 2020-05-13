@@ -1,0 +1,15 @@
+FROM confluentinc/cp-kafka-connect-base:5.4.1
+
+ARG jdbcDriverPath
+ARG clickHouseVersion
+ARG connectTwitterVersion
+
+ENV JDBC_DRIVER_PATH=/usr/share/confluent-hub-components/confluentinc-kafka-connect-jdbc/lib
+ENV JDBC_DRIVER=clickhouse-jdbc-$clickHouseVersion.jar
+
+RUN confluent-hub install --no-prompt jcustenborder/kafka-connect-twitter:$connectTwitterVersion
+RUN confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:5.4.1
+
+RUN mkdir -p $JDBC_DRIVER_PATH && \
+	echo "Downloading JDBC Driver for ClickHouse v$clickHouseVersion" && \
+	wget -O ${JDBC_DRIVER_PATH}/${JDBC_DRIVER} https://github.com/ClickHouse/clickhouse-jdbc/releases/download/release_$clickHouseVersion/${JDBC_DRIVER}
